@@ -1,57 +1,67 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
-	public float speed;             //Floating point variable to store the player's movement speed.
-
+	public float speed;           
+	private float moveHorizontal;
+	private float moveVertical;
 	private Rigidbody2D rb2d;
-	//Store a reference to the Rigidbody2D component required to use 2D Physics.
+
 	private Animator ani1;
 	private Vector2 movement;
-	// Use this for initialization
+	public bool grounded;
+	public float jumpforce;
+	private bool jump;
+	private float facingright;
 	void Start()
 	{
 		ani1 = GetComponent<Animator>();
-		//Get and store a reference to the Rigidbody2D component so that we can access it.
+		facingright = transform.localScale.x;
 		rb2d = GetComponent<Rigidbody2D> ();
 
 	}
 
-	//FixedUpdate is called at a fixed interval and is independent of frame rate. Put physics code here.
-	void FixedUpdate()
-	{
-		//Store the current horizontal input in the float moveHorizontal.
-		float moveHorizontal = Input.GetAxis ("Horizontal");
-		float moveVertical = Input.GetAxis ("Vertical");
+	void Update(){
+
+		moveHorizontal = Input.GetAxis ("Horizontal");
+		moveVertical = Input.GetAxis ("Vertical");
 		movement = new Vector2 (moveHorizontal, moveVertical);
 
-		if(moveHorizontal != 0)
+		if(Input.GetButtonDown("Jump"))
 		{
-			rb2d.AddForce (movement * speed);
-			ani1.SetBool ("walking", true);
-
+			jump = true;
+			ani1.SetBool ("jumping", jump);
 		}
-		else {
-			ani1.SetBool ("walking", false);
+		ani1.SetBool ("grounded", grounded);
+		if (Input.GetAxis ("Horizontal") < -0.1f) {
+			transform.localScale = new Vector2 (-facingright, transform.localScale.y);
+		}
+		if (Input.GetAxis ("Horizontal") > 0.1f) {
+			transform.localScale = new Vector2 (facingright, transform.localScale.y);
 		}
 
-		//Store the current vertical input in the float moveVertical.
-
-
-		if(moveHorizontal != 0)
-		{
-			rb2d.transform.Translate (movement);
-			ani1.SetBool ("walking", true);
+	}
+		
+	void FixedUpdate()
+	{
+		if (jump && grounded) {
+			rb2d.AddForce (Vector2.up * jumpforce, ForceMode2D.Impulse);
+			jump = false;
+			ani1.SetBool ("jumping", jump);
 		}
-		else {
-			ani1.SetBool ("walking", false);
-		}
-		//Use the two store floats to create a new Vector2 variable movement.
-
-
-		//Call the AddForce function of our Rigidbody2D rb2d supplying movement multiplied by speed to move our player.
-
 	
+		if(moveHorizontal != 0)
+		{
+			rb2d.transform.Translate (movement * speed);
+			ani1.SetBool ("walking", true);
+		}
+		else {
+			ani1.SetBool ("walking", false);
+		}
+			
+
+
 	}
 }
