@@ -27,7 +27,7 @@ public class PlayerController : MonoBehaviour {
 
 		moveHorizontal = Input.GetAxis ("Horizontal");
 		moveVertical = Input.GetAxis ("Vertical");
-		movement = new Vector2 (moveHorizontal, moveVertical);
+		movement = new Vector2 (moveHorizontal,0f);
 
 		if(Input.GetButtonDown("Jump"))
 		{
@@ -47,7 +47,7 @@ public class PlayerController : MonoBehaviour {
 	void FixedUpdate()
 	{
 		if (jump && grounded) {
-			rb2d.AddForce (Vector2.up * jumpforce, ForceMode2D.Impulse);
+			rb2d.AddForce(Vector2.up * jumpforce, ForceMode2D.Impulse);
 			jump = false;
 			ani1.SetBool ("jumping", jump);
 		}
